@@ -37,3 +37,7 @@ dist/
 .npmrc
 
 data/*
+
+# sync local to hugo
+sync.sh
+ReadMyself.md

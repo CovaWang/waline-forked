@@ -1,4 +1,8 @@
 const BaseRest = require('./rest.js');
+const {
+  formatInlineAnnotation,
+  normalizeInlineAnnotation,
+} = require('../service/inline-annotation.js');
 const { getMarkdownParser } = require('../service/markdown/index.js');
 
 const markdownParser = getMarkdownParser(think.config('markdown'));
@@ -75,6 +79,25 @@ module.exports = class CommentController extends BaseRest {
   constructor(ctx) {
     super(ctx);
     this.modelInstance = this.getModel('Comment');
+    this.annotationModel = this.getModel('Annotation');
+  }
+
+  async attachInlineAnnotations(comments) {
+    if (process.env.INLINE_COMMENT_ENABLED !== 'true' || comments.length === 0) return;
+
+    const commentIds = comments.map(({ objectId }) => objectId);
+    const annotations = await this.annotationModel.select({
+      comment_id: ['IN', commentIds],
+    });
+    const annotationsByComment = new Map(
+      annotations.map((annotation) => [annotation.comment_id, formatInlineAnnotation(annotation)]),
+    );
+
+    comments.forEach((comment) => {
+      const annotation = annotationsByComment.get(comment.objectId);
+
+      if (annotation) comment.annotation = annotation;
+    });
   }
 
   async getAction() {
@@ -95,7 +118,19 @@ module.exports = class CommentController extends BaseRest {
   async postAction() {
     think.logger.debug('Post Comment Start!');
 
-    const { comment, link, mail, nick, pid, rid, ua, url, at } = this.post();
+    const { annotation, comment, link, mail, nick, pid, rid, ua, url, at } = this.post();
+    let inlineAnnotation;
+
+    if (annotation !== undefined) {
+      if (process.env.INLINE_COMMENT_ENABLED !== 'true') {
+        return this.fail('Inline comments are not enabled');
+      }
+
+      if (pid || rid || !(inlineAnnotation = normalizeInlineAnnotation(annotation))) {
+        return this.fail('Invalid inline annotation');
+      }
+    }
+
     const data = {
       link,
       mail,
@@ -213,6 +248,23 @@ module.exports = class CommentController extends BaseRest {
     think.logger.debug(`Comment post hooks preSave done!`);
 
     const resp = await this.modelInstance.add(data);
+
+    if (inlineAnnotation) {
+      try {
+        const savedAnnotation = await this.annotationModel.add({
+          comment_id: resp.objectId,
+          url,
+          selector: inlineAnnotation.selector,
+          article_fingerprint: inlineAnnotation.articleFingerprint,
+          annotation_type: inlineAnnotation.annotationType,
+        });
+
+        resp.annotation = formatInlineAnnotation(savedAnnotation);
+      } catch (err) {
+        await this.modelInstance.delete({ objectId: resp.objectId });
+        throw err;
+      }
+    }
 
     think.logger.debug(`Comment have been added to storage.`);
 
@@ -439,6 +491,8 @@ module.exports = class CommentController extends BaseRest {
           )
         : [];
     const comments = [...rootComments, ...children];
+
+    await this.attachInlineAnnotations(comments);
 
     const userModel = this.getModel('Users');
     const user_ids = [...new Set(comments.map(({ user_id }) => user_id).filter(Boolean))];

@@ -2,6 +2,57 @@ export type WalineCommentStatus = 'approved' | 'waiting' | 'spam';
 
 export type WalineUserType = 'administrator' | 'guest';
 
+export interface WalineTextQuoteSelector {
+  /** Selected text */
+  exact: string;
+
+  /** Text immediately before the selection */
+  prefix: string;
+
+  /** Text immediately after the selection */
+  suffix: string;
+}
+
+export interface WalineTextPositionSelector {
+  /** Selection start in the article text content */
+  start: number;
+
+  /** Selection end in the article text content */
+  end: number;
+}
+
+export interface WalineDomRangeSelector {
+  /** Child-node path from the article root to the start container */
+  startPath: number[];
+
+  /** Offset inside the start container */
+  startOffset: number;
+
+  /** Child-node path from the article root to the end container */
+  endPath: number[];
+
+  /** Offset inside the end container */
+  endOffset: number;
+}
+
+export interface WalineTextAnchor {
+  quote: WalineTextQuoteSelector;
+  position: WalineTextPositionSelector;
+  range?: WalineDomRangeSelector;
+}
+
+export interface WalineInlineAnnotationInput {
+  selector: WalineTextAnchor;
+  articleFingerprint?: string;
+  annotationType?: 'thought';
+}
+
+export interface WalineInlineAnnotation extends WalineInlineAnnotationInput {
+  objectId: number;
+  commentId: number;
+  url: string;
+}
+
 export interface WalineCommentData {
   /** User Nickname */
   nick: string;
@@ -50,6 +101,9 @@ export interface WalineCommentData {
 
   /** Turnstile Token */
   turnstile?: string;
+
+  /** Text anchor for a thought attached to article content */
+  annotation?: WalineInlineAnnotationInput;
 }
 
 export interface BaseWalineResponseComment {
@@ -156,6 +210,9 @@ export interface BaseWalineResponseComment {
    * 管理员可获得 `approved`、`spam` 和 `waiting`，其他用户只能获得 `approved`
    */
   status?: WalineCommentStatus;
+
+  /** Inline thought metadata, when this comment is anchored to article text */
+  annotation?: WalineInlineAnnotation;
 }
 
 export interface WalineChildComment extends BaseWalineResponseComment {

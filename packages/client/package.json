@@ -36,6 +36,11 @@
       "import": "./dist/waline.js",
       "default": "./dist/waline.umd.js"
     },
+    "./inline-comment": {
+      "types": "./dist/waline-with-inline-comment.d.ts",
+      "import": "./dist/waline-with-inline-comment.js",
+      "default": "./dist/waline-with-inline-comment.umd.js"
+    },
     "./comment": {
       "types": "./dist/comment.d.ts",
       "import": "./dist/comment.js",

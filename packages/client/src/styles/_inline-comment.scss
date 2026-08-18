@@ -1,0 +1,102 @@
+::highlight(waline-inline-comment) {
+  background: color-mix(in srgb, var(--waline-theme-color, #27ae60) 28%, transparent);
+  color: inherit;
+
+  text-decoration: underline;
+
+  text-decoration-color: color-mix(in srgb, var(--waline-theme-color, #27ae60) 72%, transparent);
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.16em;
+}
+
+.wl-inline-action {
+  position: fixed;
+  z-index: 1000;
+
+  min-width: 80px;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 999px;
+
+  background: var(--waline-theme-color, #27ae60);
+  color: #fff;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 18%);
+
+  cursor: pointer;
+}
+
+.wl-inline-composer {
+  width: min(92vw, 440px);
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+
+  background: var(--waline-bg-color, #fff);
+  color: var(--waline-color, #444);
+  box-shadow: 0 18px 60px rgb(0 0 0 / 24%);
+
+  &::backdrop {
+    background: rgb(0 0 0 / 35%);
+    backdrop-filter: blur(2px);
+  }
+
+  form {
+    display: grid;
+    gap: 12px;
+    padding: 20px;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  input,
+  textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid var(--waline-border-color, #ddd);
+    border-radius: 8px;
+
+    background: transparent;
+    color: inherit;
+
+    font: inherit;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+.wl-inline-quote {
+  overflow: auto;
+
+  max-height: 7em;
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--waline-theme-color, #27ae60);
+
+  background: var(--waline-bg-color-light, #f8f8f8);
+  color: var(--waline-light-grey, #999);
+}
+
+.wl-inline-composer-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+
+  button {
+    padding: 7px 12px;
+    border: 1px solid var(--waline-border-color, #ddd);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  button[type='submit'] {
+    border-color: var(--waline-theme-color, #27ae60);
+    background: var(--waline-theme-color, #27ae60);
+    color: #fff;
+  }
+}

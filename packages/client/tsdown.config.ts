@@ -74,6 +74,22 @@ export default defineConfig([
   },
   {
     ...commonOptions,
+    entry: {
+      'waline-with-inline-comment': './src/entries/inline-comment.ts',
+    },
+    format: ['esm', 'umd'],
+    globalName: 'WalineWithInlineComment',
+    alias: {
+      vue: 'vue/dist/vue.runtime.esm-bundler.js',
+    },
+    plugins: [vue(vuePluginOptions)],
+    deps: {
+      alwaysBundle,
+      onlyBundle,
+    },
+  },
+  {
+    ...commonOptions,
     entry: { slim: './src/entries/full.ts' },
     target: ['node22', 'baseline-widely-available'],
     define,

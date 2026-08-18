@@ -1,0 +1,64 @@
+name: waline-with-inline-comment
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - inline-comment
+    paths:
+      - .github/workflows/waline-with-inline-comment.yml
+      - assets/waline-with-inline-comment.pgsql
+      - packages/api/**
+      - packages/client/**
+      - packages/server/**
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.18.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm ci
+
+      - name: Build API and client
+        run: |
+          pnpm api:build
+          pnpm client:build
+
+      - name: Test inline comments
+        run: >-
+          pnpm exec vitest run
+          packages/client/__tests__/inline-anchor.spec.ts
+          packages/server/__tests__/inline-annotation.spec.js
+
+      - name: Assemble waline-with-inline-comment
+        run: |
+          mkdir -p release
+          cp packages/client/dist/waline-with-inline-comment.js release/
+          cp packages/client/dist/waline-with-inline-comment.umd.js release/
+          cp packages/client/dist/waline.css release/
+          cp assets/waline-with-inline-comment.pgsql release/
+          pnpm --dir packages/server pack --pack-destination ../../release
+          mv release/waline-vercel-*.tgz release/waline-with-inline-comment-server.tgz
+
+      - name: Upload waline-with-inline-comment
+        uses: actions/upload-artifact@v4
+        with:
+          name: waline-with-inline-comment
+          path: release/
+          if-no-files-found: error
