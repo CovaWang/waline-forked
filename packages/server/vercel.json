@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm install --omit=dev --workspaces=false",
+  "buildCommand": "",
+  "outputDirectory": "public",
+  "functions": {
+    "api/index.cjs": {
+      "includeFiles": "{src/**,node_modules/@mathjax/**,node_modules/mhchemparser/**,node_modules/ip2region/data/**}"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/((?!robots\\.txt$).*)",
+      "destination": "/api/index"
+    }
+  ]
+}
