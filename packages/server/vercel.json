@@ -5,7 +5,7 @@
   "buildCommand": "",
   "outputDirectory": "public",
   "functions": {
-    "api/index.cjs": {
+    "api/index.js": {
       "includeFiles": "{src/**,node_modules/@mathjax/**,node_modules/mhchemparser/**,node_modules/ip2region/data/**}"
     }
   },
