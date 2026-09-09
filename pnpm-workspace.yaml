@@ -46,6 +46,7 @@ overrides:
   '@waline/client': workspace:*
   '@xmldom/xmldom': ^0.9.10
   'think-helper>uuid': 11.1.0 # FIXME: 兼容commonjs
+  '@waline/vercel>jsdom': 26.1.0
 packageExtensions:
   # FIXME: This is a bug in mathjax
   '@mathjax/mathjax-newcm-font':
